@@ -1,12 +1,13 @@
 from base_viewer import BaseViewer
 
 from latextools_utils import get_setting
-from latextools_utils.external_command import external_command
 from latextools_utils.sublime_utils import get_sublime_exe
 
+from copy import copy
 import os
 import re
 import shlex
+import subprocess
 import sublime
 import string
 import sys
@@ -19,9 +20,19 @@ except ImportError:
 if sys.version_info >= (3, 0):
     PY2 = False
     strbase = str
+
+    def get_texpath():
+        platform_settings = get_setting(sublime.platform(), {})
+        texpath = platform_settings.get('texpath', '')
+        return os.path.expandvars(texpath)
 else:
     PY2 = True
     strbase = basestring
+
+    def get_texpath():
+        platform_settings = get_setting(sublime.platform(), {})
+        texpath = platform_settings.get('texpath', '')
+        return os.path.expandvars(texpath).encode(sys.getfilesystemencoding())
 
 
 # a viewer that runs a user-specified command
@@ -126,8 +137,19 @@ class CommandViewer(BaseViewer):
         if not replaced:
             command.append(pdf_file)
 
-        external_command(
+        startupinfo = None
+        if sublime.platform() == 'windows':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+        env = copy(os.environ)
+        env['PATH'] = get_texpath() or env['PATH']
+
+        print('Running {0}'.format(quote(' '.join(command))))
+        subprocess.Popen(
             command,
+            startupinfo=startupinfo,
+            env=env,
             cwd=os.path.split(pdf_file)[0]
         )
 

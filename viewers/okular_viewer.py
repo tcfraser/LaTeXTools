@@ -1,8 +1,9 @@
 from base_viewer import BaseViewer
 
 from latextools_utils import get_setting
-from latextools_utils.external_command import external_command, check_output
 
+import subprocess
+import sys
 import time
 
 
@@ -16,19 +17,19 @@ class OkularViewer(BaseViewer):
         if locator is not None:
             command.append(locator)
 
-        external_command(command, use_texpath=False)
+        subprocess.Popen(command)
 
     def _is_okular_running(self):
-        try:
-            running_apps = check_output(['ps', 'xv'], use_texpath=False)
-            for app in running_apps.splitlines():
-                if 'okular' not in app:
-                    continue
-                if '--unique' in app:
-                    return True
-        except:
-            pass
+        stdout = subprocess.Popen(
+            ['ps', 'xw'], stdout=subprocess.PIPE
+        ).communicate()[0]
 
+        running_apps = stdout.decode(sys.getdefaultencoding(), 'ignore')
+        for app in running_apps.splitlines():
+            if 'okular' not in app:
+                continue
+            if '--unique' in app:
+                return True
         return False
 
     def _ensure_okular(self, **kwargs):

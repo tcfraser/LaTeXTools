@@ -307,6 +307,7 @@ def _create_cache_timestamp(cache_path):
 
 def _validate_life_span(cache_path):
     life_span = _read_life_span()
+    print(u"life_span: '{0}'".format(life_span))
     # if life span is none: only manual deletion
     if life_span is None:
         return
@@ -335,6 +336,7 @@ def _read_cache_timestamp(cache_path):
 def _read_life_span():
     try:
         life_span_string = get_setting("local_cache_life_span")
+        print(u"life_span_string: '{0}'".format(repr(life_span_string)))
         if not life_span_string:
             raise Exception(u"No lifespan defined")
         if life_span_string == "infinite":
@@ -360,6 +362,8 @@ def _convert_life_span_string(life_span_string):
     """Converts a TIME_RE compatible life span string,
     raises an exception if it is not compatible"""
     (d, h, m, s) = TIME_RE.match(life_span_string).groups()
+    print(u"User options: (days: {0}, hours: {1}, minutes: {2}, seconds: {3}):"
+          .format(repr(d), repr(h), repr(m), repr(s)))
     # time conversions in seconds
     times = [(s, 1), (m, 60), (h, 3600), (d, 86400)]
     # sum the converted times

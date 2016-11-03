@@ -22,8 +22,7 @@ import codecs
 _ref_special_commands = "|".join([
     "", "eq", "page", "v", "V", "auto", "autopage", "name",
     "c", "C", "cpage", "Cpage", "namec", "nameC", "lcnamec", "labelc",
-    "labelcpage", "sub", "f", "F", "vpage", "t", "p", "A", "B", "P", "S",
-    "title", "headname", "tocname"
+    "labelcpage", "sub", "f", "F", "v", "vpage", "V"
 ])[::-1]
 
 OLD_STYLE_REF_REGEX = re.compile(

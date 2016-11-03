@@ -1,8 +1,7 @@
 from base_viewer import BaseViewer
 
 import os
-
-from latextools_utils.external_command import check_output, external_command
+import subprocess
 
 
 class SkimViewer(BaseViewer):
@@ -12,11 +11,11 @@ class SkimViewer(BaseViewer):
         path_to_skim = '/Applications/Skim.app'
 
         if not os.path.exists(path_to_skim):
-            path_to_skim = check_output([
+            path_to_skim = subprocess.check_output([
                 'osascript',
                 '-e',
                 'POSIX path of (path to app id "net.sourceforge.skim-app.skim")'
-            ], use_texpath=False)
+            ]).decode("utf8")[:-1]
 
         command = [
             os.path.join(
@@ -35,7 +34,7 @@ class SkimViewer(BaseViewer):
             str(line), pdf_file, tex_file
         ]
 
-        external_command(command, use_texpath=False)
+        subprocess.Popen(command)
 
     def view_file(self, pdf_file, **kwargs):
         keep_focus = kwargs.pop('keep_focus', True)
@@ -58,7 +57,7 @@ class SkimViewer(BaseViewer):
 
         command.append(pdf_file)
 
-        external_command(command, use_texpath=False)
+        subprocess.Popen(command)
 
     def supports_keep_focus(self):
         return True
